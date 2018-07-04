@@ -588,6 +588,7 @@ function updateTrackPosition() {
 
 function hideLogin() {
   document.getElementById('biglogin').style.display = 'none';
+  document.getElementById('options').style.display = 'block';
 }
 
 function showLogin() {
@@ -595,13 +596,22 @@ function showLogin() {
 }
 
 function toast(title, subtitle) {
+  if (title == '')
+    return;
   document.getElementById('text').innerText = title || '';
   document.getElementById('text2').innerText = subtitle || '';
   document.getElementById('toast').className = 'toast visible';
+  document.getElementById('previous').style.display = 'block';
+  document.getElementById('next').style.display = 'block';
+  // check if full screen, because if it is, we don't show these options
+  var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+  if (!fullscreenElement)
+    document.getElementById('options').style.display = 'block';
 
   clearTimeout(closetimer);
   closetimer = setTimeout(function () {
     document.getElementById('toast').className = 'toast';
+    document.getElementById('options').style.display = 'none';
   }, 5000);
 }
 
@@ -624,6 +634,9 @@ function setNowPlayingTrack(track) {
   toast(trackName, artistName + ' - ' + albumName);
 }
 
+function showtoast(){
+  toast(trackName, artistName + ' - ' + albumName);
+}
 
 
 function msPerImage() {
@@ -695,7 +708,7 @@ function initUI() {
     sendCommand('PUT', 'seek', 'position_ms='+Math.round(time));
   });
 
-  setInterval(updateTrackPosition, 1000);
+  setInterval(updateTrackPosition, 500);
 }
 
 function initKeyboard() {
@@ -737,6 +750,26 @@ function initKeyboard() {
   });
 }
 
+function goBack(){
+  sendCommand('POST', 'previous');
+}
+
+function goNext(){
+    sendCommand('POST', 'next');
+}
+
+function goFullScreen(){
+  var elem = document.getElementById("body");
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  }
+}
 
 
 // --------------------------------------------------------------------------------------
@@ -754,3 +787,30 @@ function bootstrap() {
 }
 
 window.addEventListener('load', bootstrap);
+
+// regular browsers
+document.addEventListener("fullscreenchange", function( event ) {
+  var fullScreenElement = document.fullScreenElement;
+  if (fullScreenElement)
+    document.getElementById("full-screen").style.display="none";
+  else
+    document.getElementById("full-screen").style.display="block";
+});
+
+// mozilla firefox
+document.addEventListener("mozfullscreenchange", function( event ) {
+  var fullscreenElement = document.mozFullScreenElement;
+  if (fullscreenElement)
+    document.getElementById("full-screen").style.display="none";
+  else
+    document.getElementById("full-screen").style.display="block";
+});
+
+// safari
+document.addEventListener("webkitfullscreenchange", function( event ) {
+  var fullscreenElement = document.webkitFullscreenElement;
+  if (fullscreenElement)
+    document.getElementById("full-screen").style.display="none";
+  else
+    document.getElementById("full-screen").style.display="block";
+});
