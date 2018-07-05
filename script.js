@@ -58,6 +58,10 @@ var closetimer = 0;
 var fadeinTime = 10000;
 var fadeoutTime = 4000;
 
+var duration = 0;
+var beats = {};
+var t_position = 0;
+
 
 // --------------------------------------------------------------------------------------
 // Some polyfills
@@ -584,6 +588,31 @@ function updateTrackPosition() {
   var w = trackPosition * 100 / trackDuration;
   w = Math.max(Math.min(100, w), 0);
   document.getElementById('trackpositionfill').style.width = w + '%';
+
+  second = trackPosition / trackDuration * duration;
+
+  second = second + 2 // compensate;
+
+  animateBar(second);
+}
+
+function animateBar(second){
+  value = 0;
+  pos = findInBeats(second);
+  console.log(pos);
+  if (pos!=-1){
+    value = parseFloat(beats[pos].confidence);
+    document.getElementById("bar").style.height = String(value * 5) + "em";
+      //updateBackground(value);
+  }
+}
+
+function findInBeats(second){
+  for (var i in beats){
+    if (beats[i].start <= second && beats[i].start + beats[i].duration > second)
+      return i;
+  }
+  return -1;
 }
 
 function hideLogin() {
@@ -632,11 +661,34 @@ function setNowPlayingTrack(track) {
   });
   trackURI = uri;
   getAlbumArtwork(trackURI);
+  getTrackInfo(trackURI);
   toast(trackName, artistName + ' - ' + albumName);
 }
 
 function showtoast(){
   toast(trackName, artistName + ' - ' + albumName);
+}
+
+function getTrackInfo(trackURI){
+  var artwork_url = "";
+  beats = {};
+  uri = trackURI.replace("spotify:track:","");
+  trackURI = uri;
+  var url = "https://api.spotify.com/v1/audio-analysis/" + trackURI;
+  createAuthorizedRequest(
+    'GET',
+    url,
+    function(request) {
+      if (request.status < 200 || request.status >= 400) {
+        return;
+      }
+      var data = JSON.parse(request.responseText);
+      duration = data.track.duration;
+      beats = data.beats;
+      t_position = 0;
+
+    }
+  ).send();
 }
 
 function getAlbumArtwork(trackURI){
@@ -658,6 +710,8 @@ function getAlbumArtwork(trackURI){
   ).send();
 }
 
+var cover_r,cover_g,cover_b;
+
 function setAlbumArtwork(album_artwork){
   img = document.getElementById("cover");
   img.crossOrigin = "Anonymous";
@@ -665,12 +719,16 @@ function setAlbumArtwork(album_artwork){
     var colorThief = new ColorThief();
     valores = colorThief.getColor(document.getElementById("cover"));
     var canvas = document.getElementById("canvas");
-    var r = valores[0] / 255.0;
-    var g = valores[1]/ 255.0;
-    var b = valores[2]/ 255.0;
-    gl.clearColor(r,g,b, 1);
+    cover_r = valores[0] / 255.0;
+    cover_g = valores[1]/ 255.0;
+    cover_b = valores[2]/ 255.0;
+    gl.clearColor(cover_r,cover_g,cover_b, 1);
   }
   img.src = album_artwork;
+}
+
+function updateBackground(value){
+  gl.clearColor(cover_r,cover_g,cover_b, value);
 }
 
 
@@ -742,6 +800,7 @@ function initUI() {
     var time = event.offsetX * trackDuration / document.body.offsetWidth;
     trackPosition = time;
     sendCommand('PUT', 'seek', 'position_ms='+Math.round(time));
+    t_position = 0;
   });
 
   setInterval(updateTrackPosition, 500);

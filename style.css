@@ -148,3 +148,13 @@ div.trackposition div.fill {
 #cover{
   display: none;
 }
+
+#bar{
+  background-color: white;
+  height: 5em;
+  width: 1%;
+  position: absolute;
+  top:1em;
+  left:1em;
+  transition: height 0.35s;
+}
