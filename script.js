@@ -631,12 +631,48 @@ function setNowPlayingTrack(track) {
     });
   });
   trackURI = uri;
+  getAlbumArtwork(trackURI);
   toast(trackName, artistName + ' - ' + albumName);
 }
 
 function showtoast(){
   toast(trackName, artistName + ' - ' + albumName);
 }
+
+function getAlbumArtwork(trackURI){
+  var artwork_url = "";
+  uri = trackURI.replace("spotify:track:","");
+  trackURI = uri;
+  var url = "https://api.spotify.com/v1/tracks/" + trackURI;
+  createAuthorizedRequest(
+    'GET',
+    url,
+    function(request) {
+      if (request.status < 200 || request.status >= 400) {
+        return;
+      }
+      var data = JSON.parse(request.responseText);
+      artwork_url = data.album.images[0].url;
+      setAlbumArtwork(artwork_url);
+    }
+  ).send();
+}
+
+function setAlbumArtwork(album_artwork){
+  img = document.getElementById("cover");
+  img.crossOrigin = "Anonymous";
+  img.onload = function() {
+    var colorThief = new ColorThief();
+    valores = colorThief.getColor(document.getElementById("cover"));
+    var canvas = document.getElementById("canvas");
+    var r = valores[0] / 255.0;
+    var g = valores[1]/ 255.0;
+    var b = valores[2]/ 255.0;
+    gl.clearColor(r,g,b, 1);
+  }
+  img.src = album_artwork;
+}
+
 
 
 function msPerImage() {

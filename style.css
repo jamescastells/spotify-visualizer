@@ -74,7 +74,7 @@ div.toast #text {
     display: block;
     font-size: 25pt;
     font-family: "Helvetica Neue", Helvetica;
-    font-weight: 100;
+    font-weight: bold;
     color: #fff;
     width:80%;
     margin:auto;
@@ -84,7 +84,7 @@ div.toast #text2 {
     display: block;
     font-size: 15pt;
     font-family: "Helvetica Neue", Helvetica;
-    font-weight: 100;
+    font-weight: bold;
     color: #ccc;
     width: 80%;
     margin:auto;
@@ -143,4 +143,8 @@ div.trackposition div.fill {
 #options > #full-screen {
   font-size: 25pt;
   color:white;
+}
+
+#cover{
+  display: none;
 }

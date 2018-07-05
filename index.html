@@ -6,14 +6,18 @@
   <link rel="stylesheet" href="gh-fork-ribbon.min.css" />
   <script type="text/javascript" src="glmatrix.js"></script>
   <script type="text/javascript" src="script.js"></script>
+  <script type="text/javascript" src="colorThief.js"></script>
   <link href="static/css/all.css" rel="stylesheet">
 </head>
+
 <body onmousemove="showtoast();" onmousedown="showtoast();" id="body">
   <div id="options"><i onclick="goFullScreen()" id="full-screen" class="fas fa-external-link-square-alt"></i></div>
   <canvas id="canvas" style="border: none; width:100%; height:100%;" width="1200" height="800">
 </canvas><br/>
   <div id="biglogin" class="biglogin"><a onclick="login()">Sign in to Spotify</a></div>
   <div id="toast" class="toast"><span id="text"></span><span id="text2"></span><div id="previous" onclick="goBack()"><i class="fas fa-backward"></i></div><div id="next" onclick="goNext()"><i class="fas fa-forward"></i></div>
+<img id="cover">
   <div class="trackposition" id="trackposition"><div class="fill" id="trackpositionfill"></div></div>
+</body>
 </body>
 </html>
